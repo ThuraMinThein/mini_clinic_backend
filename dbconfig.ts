@@ -5,8 +5,9 @@ const config: MysqlConnectionOptions = {
   host: process.env.MYSQLHOST,
   port: +process.env.MYSQLPORT,
   username: process.env.MYSQLUSERNAME,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATBASE,
+  entities: [__dirname + '/**/*.entity{.ts,.js}'],
   synchronize: true,
 };
 

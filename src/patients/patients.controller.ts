@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseFilters,
+} from '@nestjs/common';
 import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { TypeormExceptionFilter } from 'src/exceptionfilters/typeorm-exception.filter';
 
-@Controller('patients')
+@Controller({
+  version: '1',
+  path: 'patients',
+})
+@UseFilters(TypeormExceptionFilter)
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 

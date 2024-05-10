@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Patient } from './entities/patient.entity';
 
 @Injectable()
 export class PatientsService {
+  constructor(
+    @InjectRepository(Patient) private patientsRepository: Repository<Patient>,
+  ) {}
+
   create(createPatientDto: CreatePatientDto) {
-    return 'This action adds a new patient';
+    const patient = this.patientsRepository.create(createPatientDto);
+    return this.patientsRepository.save(patient);
   }
 
   findAll() {
-    return `This action returns all patients`;
+    return this.patientsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} patient`;
+  async findOne(id: number) {
+    const patient = await this.patientsRepository.findOne({
+      where: {
+        patientId: id,
+      },
+    });
+    if (!patient) throw new NotFoundException('Patient not found');
+    return patient;
   }
 
-  update(id: number, updatePatientDto: UpdatePatientDto) {
-    return `This action updates a #${id} patient`;
+  async update(id: number, updatePatientDto: UpdatePatientDto) {
+    const patient = await this.findOne(id);
+
+    const updatedPatient = this.patientsRepository.create({
+      ...patient,
+      ...updatePatientDto,
+    });
+
+    return this.patientsRepository.save(updatedPatient);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} patient`;
+  async remove(id: number) {
+    const patient = await this.findOne(id);
+    await this.patientsRepository.delete(patient);
+    return {
+      message: 'Patient deleted successfully',
+      patient,
+    };
   }
 }
